@@ -1,0 +1,72 @@
+package com.dlug.arduinocontrol;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Toast;
+import java.io.*;
+import java.util.Set;
+
+
+public class MainActivity extends AppCompatActivity {
+    public static final int REQUEST_ENABLE_BT = 1;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode){
+            case REQUEST_ENABLE_BT:
+                if(resultCode==RESULT_OK){
+                    Toast.makeText(this, "블루투스가 켜졌습니다.", Toast.LENGTH_SHORT).show();
+
+                }
+                else if(resultCode == RESULT_CANCELED){
+                    Toast.makeText(this, "블루투스를 키지 않으면 실행할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        BluetoothCheck();
+    }
+    void BluetoothCheck(){
+        BluetoothAdapter testBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> pairedDevices = testBluetoothAdapter.getBondedDevices();
+        if(testBluetoothAdapter == null){
+            Toast.makeText(this, "기기가 블루투스를 지원하지 않습니다.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else {
+            Toast.makeText(this, "기기가 블루투스를 지원합니다.", Toast.LENGTH_SHORT).show();
+            if (!testBluetoothAdapter.isEnabled()) {
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(intent, REQUEST_ENABLE_BT);
+                if(pairedDevices.size()>0){
+                    Toast.makeText(this, "이미 연결된 디바이스가 있습니다", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    selectDevice();
+                }
+            }
+            else {
+
+                if(pairedDevices.size()>0){
+                    Toast.makeText(this, "이미 연결된 디바이스가 있습니다", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    selectDevice();
+                }
+            }
+        }
+
+        void selectDevice() {
+        }
+    }
+
+}
